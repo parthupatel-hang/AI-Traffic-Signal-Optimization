@@ -15,28 +15,12 @@ An intelligent four-way traffic management system combining a **Decision Tree cl
 - Separate YOLO image/video analysis window.
 - Ahmedabad/Gujarat-oriented four-way junction layout.
 
-## Architecture
-
-```text
-Traffic Simulation GUI
-  ├── Vehicle Manager
-  ├── Signal Controller
-  └── Decision Tree AI Controller
-
-YOLOv8 Vision Pipeline
-  ├── Vehicle Detection
-  ├── Centroid Tracking
-  ├── Road Assignment / ROI
-  ├── Traffic Metrics
-  └── Adaptive Green Recommendation
-```
-
 ## Repository Structure
 
 ```text
 AI-Traffic-Signal-Optimization/
 ├── Data/
-│   └── README.md
+│   └── traffic_dataset.csv
 ├── GUI/
 │   ├── __init__.py
 │   ├── ai_controller.py
@@ -44,11 +28,12 @@ AI-Traffic-Signal-Optimization/
 │   ├── intersection.py
 │   ├── traffic_lights.py
 │   └── vehicles.py
-├── Input/config/
-│   └── road_config.json
+├── Input/
+│   ├── config/road_config.json
+│   └── images/traffic_test.jpg
 ├── Model/
-│   ├── README.md
-│   ├── __init__.py
+│   ├── model.pkl
+│   ├── label_encoders.pkl
 │   ├── decision_tree_model.py
 │   ├── train_model.py
 │   ├── evaluate_model.py
@@ -56,17 +41,7 @@ AI-Traffic-Signal-Optimization/
 │   ├── feature_importance.py
 │   └── visualize_tree.py
 ├── Vision/
-│   ├── __init__.py
-│   ├── yolo_detector.py
-│   ├── yolo_ui.py
-│   ├── tracker.py
-│   ├── road_assigner.py
-│   ├── traffic_metrics.py
-│   ├── adaptive_controller.py
-│   ├── pipeline.py
-│   ├── video_runner.py
-│   └── calibration.py
-├── tests/test_core.py
+├── tests/
 ├── .gitignore
 ├── requirements.txt
 ├── INSTALL.bat
@@ -74,6 +49,12 @@ AI-Traffic-Signal-Optimization/
 ├── RUN_PHASE2.bat
 └── README.md
 ```
+
+## Original Project Data and Model
+
+This repository is intended to reproduce the supplied project directly. The **original 20,000-record `Data/traffic_dataset.csv`** is required by the project and is not replaced by demo or synthetic data. The trained Decision Tree artifacts are `Model/model.pkl` and `Model/label_encoders.pkl`.
+
+Do not run model training unless you intentionally want to regenerate the supplied model artifacts. The normal run uses the bundled model and encoder files.
 
 ## Ahmedabad Junction Mode
 
@@ -86,9 +67,7 @@ The simulation follows the intended orientation:
 
 Only one direction is green at a time. The simulation includes stop-line behavior, free-left movement, yellow transition, and all-red clearance.
 
-## Installation
-
-### Windows
+## Installation — Windows
 
 Run:
 
@@ -102,30 +81,43 @@ Manual setup:
 python -m venv venv
 venv\\Scripts\\activate
 python -m pip install -r requirements.txt
-python -m Model.train_model
 ```
 
-The YOLOv8s weight file is intentionally not committed. Ultralytics downloads it automatically when the detector is first initialized.
+The YOLOv8s weights are downloaded automatically by Ultralytics when first required, so the large weight file does not need to be bundled with the source repository.
 
-The original 20,000-record traffic dataset is also kept outside the public source tree. If `Data/traffic_dataset.csv` is available locally, training uses it. Otherwise, `train_model.py` creates deterministic demo data so the project remains runnable.
+## Run the Project
 
-## Run the GUI
+From the repository root:
 
 ```bash
 python GUI/app.py
 ```
 
-or:
+Or on Windows:
 
 ```bat
 RUN_PHASE2.bat
 ```
 
-## Train and Evaluate
+After cloning/downloading the repository, the supplied dataset and Decision Tree artifacts are already available at their project paths, so no separate dataset download is required.
+
+## Train / Evaluate the Decision Tree
+
+Training intentionally requires the original project dataset:
 
 ```bash
 python Model/train_model.py
+```
+
+Evaluate the trained model:
+
+```bash
 python Model/evaluate_model.py
+```
+
+Generate visualizations:
+
+```bash
 python Model/feature_importance.py
 python Model/visualize_tree.py
 ```
@@ -134,7 +126,7 @@ Training uses an 80/20 stratified split and a Decision Tree with `max_depth=15` 
 
 ## YOLO Vision
 
-The separate YOLO window supports traffic image/video analysis. The reusable vision pipeline combines YOLO detection, centroid tracking, calibrated road assignment, queue/waiting metrics, and adaptive green-road recommendation.
+The separate YOLO window supports traffic image/video analysis. The vision pipeline combines YOLO detection, centroid tracking, calibrated road assignment, queue/waiting metrics, and adaptive green-road recommendation.
 
 ROI calibration:
 
@@ -150,7 +142,7 @@ python -m pytest tests
 
 ## Repository Hygiene
 
-Virtual environments, Python caches, runtime detection outputs, local YOLO weights, and generated model binaries are excluded from Git. This keeps the public repository focused on reproducible source code and configuration.
+Virtual environments, Python caches, runtime detection outputs, local YOLO weights, and temporary files are excluded from Git. The original project dataset and required Decision Tree artifacts are intentionally treated as project inputs and are kept available for direct reproduction.
 
 ## Technology Stack
 
