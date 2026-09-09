@@ -1,43 +1,34 @@
 # AI Traffic Signal Optimization Using Decision Tree Model
 
-An intelligent four-way traffic management system that combines a **Decision Tree classifier**, adaptive signal-control logic, and **YOLOv8 vehicle detection** to prioritize traffic movement.
+An intelligent four-way traffic management system combining a **Decision Tree classifier**, adaptive signal-control logic, and **YOLOv8 vehicle detection**.
 
 ## Key Features
 
 - Decision Tree prediction of the road that should receive priority.
-- Adaptive signal switching based on vehicle count and waiting time.
-- Minimum/maximum green-time control with yellow and all-red clearance.
+- Adaptive signal switching using vehicle count and waiting time.
+- Minimum/maximum green timing with yellow and all-red clearance.
 - Emergency-vehicle priority in the simulation.
 - Per-road queue and waiting-time monitoring.
 - YOLOv8 detection for cars, motorcycles, buses, and trucks.
 - Persistent vehicle IDs through centroid tracking.
 - Configurable road-of-interest polygons.
 - Separate YOLO image/video analysis window.
-- Ahmedabad/Gujarat-oriented four-road intersection layout.
+- Ahmedabad/Gujarat-oriented four-way junction layout.
 
 ## Architecture
 
 ```text
 Traffic Simulation GUI
-        │
-        ├── Vehicle Manager
-        ├── Signal Controller
-        └── Decision Tree AI Controller
-                │
-                ├── vehicle counts
-                ├── waiting times
-                ├── time of day
-                ├── weather
-                ├── emergency state
-                └── traffic/congestion levels
+  ├── Vehicle Manager
+  ├── Signal Controller
+  └── Decision Tree AI Controller
 
 YOLOv8 Vision Pipeline
-        │
-        ├── Vehicle Detection
-        ├── Centroid Tracking
-        ├── Road Assignment (ROI)
-        ├── Traffic Metrics
-        └── Adaptive Signal Recommendation
+  ├── Vehicle Detection
+  ├── Centroid Tracking
+  ├── Road Assignment / ROI
+  ├── Traffic Metrics
+  └── Adaptive Green Recommendation
 ```
 
 ## Repository Structure
@@ -45,7 +36,7 @@ YOLOv8 Vision Pipeline
 ```text
 AI-Traffic-Signal-Optimization/
 ├── Data/
-│   └── traffic_dataset.csv
+│   └── README.md
 ├── GUI/
 │   ├── __init__.py
 │   ├── ai_controller.py
@@ -53,22 +44,17 @@ AI-Traffic-Signal-Optimization/
 │   ├── intersection.py
 │   ├── traffic_lights.py
 │   └── vehicles.py
-├── Input/
-│   ├── config/
-│   │   └── road_config.json
-│   └── images/
-│       └── traffic_test.jpg
+├── Input/config/
+│   └── road_config.json
 ├── Model/
-│   ├── model.pkl
-│   ├── label_encoders.pkl
+│   ├── README.md
+│   ├── __init__.py
 │   ├── decision_tree_model.py
 │   ├── train_model.py
 │   ├── evaluate_model.py
 │   ├── predict.py
 │   ├── feature_importance.py
-│   ├── visualize_tree.py
-│   ├── decision_tree.png
-│   └── feature_importance.png
+│   └── visualize_tree.py
 ├── Vision/
 │   ├── __init__.py
 │   ├── yolo_detector.py
@@ -80,8 +66,7 @@ AI-Traffic-Signal-Optimization/
 │   ├── pipeline.py
 │   ├── video_runner.py
 │   └── calibration.py
-├── tests/
-│   └── test_core.py
+├── tests/test_core.py
 ├── .gitignore
 ├── requirements.txt
 ├── INSTALL.bat
@@ -92,7 +77,7 @@ AI-Traffic-Signal-Optimization/
 
 ## Ahmedabad Junction Mode
 
-The simulation follows the intended four-road orientation:
+The simulation follows the intended orientation:
 
 - North signal → South side
 - South signal → North side
@@ -111,7 +96,7 @@ Run:
 INSTALL.bat
 ```
 
-Or install manually:
+Manual setup:
 
 ```bash
 python -m venv venv
@@ -120,49 +105,38 @@ python -m pip install -r requirements.txt
 python -m Model.train_model
 ```
 
-The YOLOv8s weight file is intentionally **not stored in the repository**. Ultralytics downloads it automatically when the detector is first initialized. `DOWNLOAD_MODEL.bat` can also be used to prepare it locally.
+The YOLOv8s weight file is intentionally not committed. Ultralytics downloads it automatically when the detector is first initialized.
 
-## Run the Main GUI
+The original 20,000-record traffic dataset is also kept outside the public source tree. If `Data/traffic_dataset.csv` is available locally, training uses it. Otherwise, `train_model.py` creates deterministic demo data so the project remains runnable.
 
-From the repository root:
+## Run the GUI
 
 ```bash
 python GUI/app.py
 ```
 
-Or on Windows:
+or:
 
 ```bat
 RUN_PHASE2.bat
 ```
 
-## Train / Evaluate the Decision Tree
+## Train and Evaluate
 
 ```bash
 python Model/train_model.py
 python Model/evaluate_model.py
-```
-
-The training script uses an 80/20 stratified split and a Decision Tree with `max_depth=15` and `random_state=42`. The dataset contains 20,000 records and 14 model input features plus the `BestRoad` target.
-
-Generate model visualizations with:
-
-```bash
 python Model/feature_importance.py
 python Model/visualize_tree.py
 ```
 
+Training uses an 80/20 stratified split and a Decision Tree with `max_depth=15` and `random_state=42`.
+
 ## YOLO Vision
 
-The main GUI contains a separate **YOLO Detection** window for image/video analysis. The vision pipeline also supports:
+The separate YOLO window supports traffic image/video analysis. The reusable vision pipeline combines YOLO detection, centroid tracking, calibrated road assignment, queue/waiting metrics, and adaptive green-road recommendation.
 
-- YOLOv8 vehicle detection
-- centroid-based tracking
-- calibrated road assignment
-- queue length and waiting-time metrics
-- adaptive green-road recommendation
-
-ROI calibration can be run with:
+ROI calibration:
 
 ```bash
 python Vision/calibration.py
@@ -170,17 +144,13 @@ python Vision/calibration.py
 
 ## Testing
 
-Run the smoke tests with:
-
 ```bash
 python -m pytest tests
 ```
 
-The tests cover dataset schema, model prediction, ROI assignment, and tracker ID persistence.
+## Repository Hygiene
 
-## Generated Files
-
-Runtime detection images, reports, videos, Python caches, virtual environments, and local YOLO weights are intentionally excluded from Git. This keeps the repository source-focused and reproducible.
+Virtual environments, Python caches, runtime detection outputs, local YOLO weights, and generated model binaries are excluded from Git. This keeps the public repository focused on reproducible source code and configuration.
 
 ## Technology Stack
 
